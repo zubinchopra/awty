@@ -10,9 +10,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 String message = this.text.getText().toString();
                 String phone = this.phoneNumber.getText().toString();
                 int time = Integer.parseInt(this.time.getText().toString());
+                callCustomToast(phone, message);
                 Intent intent = new Intent(MainActivity.this, MyReceiver.class);
                 intent.putExtra("MESSAGE", message);
                 intent.putExtra("PHONE", phone);
@@ -69,7 +72,24 @@ public class MainActivity extends AppCompatActivity {
                 stop();
                 this.button.setText("START");
             }
+            else{
+                Toast.makeText(MainActivity.this, "INVALID TIME ENTERED!", Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    public void callCustomToast(String phone, String message){
+        Context context = getApplicationContext();
+        LayoutInflater inflater = getLayoutInflater();
+        View customToastRoot = inflater.inflate(R.layout.custom_toast, null);
+        TextView phoneNumber = (TextView)customToastRoot.findViewById(R.id.customNumber);
+        phoneNumber.setText("TEXTING " + phone);
+        TextView textMessage = (TextView)customToastRoot.findViewById(R.id.customMessage);
+        textMessage.setText(message);
+        Toast custom_toast = new Toast(context);
+        custom_toast.setView(customToastRoot);
+        custom_toast.show();
+
     }
 
     public void start(int time){
