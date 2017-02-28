@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     EditText time;
     Button button;
     PendingIntent pendingIntent;
+    AlarmManager alarmManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,31 +54,42 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            if(isNumber(time)){
+            if(isPositiveInteger(time) && this.button.getText().toString().equalsIgnoreCase("START")){
                 this.button.setText("STOP");
                 String message = this.text.getText().toString();
                 String phone = this.phoneNumber.getText().toString();
                 int time = Integer.parseInt(this.time.getText().toString());
                 Intent intent = new Intent(MainActivity.this, MyReceiver.class);
-                pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
+                intent.putExtra("MESSAGE", message);
+                intent.putExtra("PHONE", phone);
+                pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 start(time);
+            }
+            else if(this.button.getText().toString().equalsIgnoreCase("STOP")) {
+                stop();
+                this.button.setText("START");
             }
         }
     }
 
     public void start(int time){
-        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        this.alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         int interval = 60000 * time;
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 0, interval, pendingIntent);
+        this.alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 0, interval, pendingIntent);
     }
 
-    public boolean isNumber(EditText time){
+    public void stop(){
+        this.alarmManager.cancel(pendingIntent);
+    }
+
+    public boolean isPositiveInteger(EditText time){
         boolean check = false;
         try{
             int n = Integer.parseInt(time.getText().toString());
-            check = true;
+            if(n > 0)
+                check = true;
         } catch(NumberFormatException e) {
-            Log.d("TAG", "IS NOT NUMBER!");
+            Log.d("TAG", "INVALID TIME!");
         }
         return check;
     }
