@@ -56,13 +56,13 @@ public class MainActivity extends AppCompatActivity {
                 String time = this.time.getText().toString();
                 Toast toast = Toast.makeText(getApplicationContext(), phone + ":" + message, Toast.LENGTH_SHORT);
                 toast.show();
-//                Bundle b = new Bundle();
-//                b.putString("MESSAGE", message);
-//                b.putString("PHONE", phone);
-//                b.putString("TIME", time);
-//                Intent intent = new Intent(MainActivity.this, MyIntentService.class);
-//                intent.putExtras(b);
-//                startService(intent);
+                Bundle b = new Bundle();
+                b.putString("MESSAGE", message);
+                b.putString("PHONE", phone);
+                b.putString("TIME", time);
+                Intent intent = new Intent(MainActivity.this, MyIntentService.class);
+                intent.putExtras(b);
+                startService(intent);
             }
         }
     }
