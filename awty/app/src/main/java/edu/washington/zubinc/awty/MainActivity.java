@@ -1,6 +1,9 @@
 package edu.washington.zubinc.awty;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -18,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     EditText phoneNumber;
     EditText time;
     Button button;
+    PendingIntent pendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,18 +57,18 @@ public class MainActivity extends AppCompatActivity {
                 this.button.setText("STOP");
                 String message = this.text.getText().toString();
                 String phone = this.phoneNumber.getText().toString();
-                String time = this.time.getText().toString();
-                Toast toast = Toast.makeText(getApplicationContext(), phone + ":" + message, Toast.LENGTH_SHORT);
-                toast.show();
-                Bundle b = new Bundle();
-                b.putString("MESSAGE", message);
-                b.putString("PHONE", phone);
-                b.putString("TIME", time);
-                Intent intent = new Intent(MainActivity.this, MyIntentService.class);
-                intent.putExtras(b);
-                startService(intent);
+                int time = Integer.parseInt(this.time.getText().toString());
+                Intent intent = new Intent(MainActivity.this, MyReceiver.class);
+                pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, 0);
+                start(time);
             }
         }
+    }
+
+    public void start(int time){
+        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        int interval = 60000 * time;
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 0, interval, pendingIntent);
     }
 
     public boolean isNumber(EditText time){
