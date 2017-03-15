@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,13 +32,37 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.text = (EditText)findViewById(R.id.message);
-        this.phoneNumber = (EditText)findViewById(R.id.phoneNumber);
-        this.time = (EditText)findViewById(R.id.time);
-        this.button = (Button)findViewById(R.id.button);
+        if(isAirplaneModeOn(this)){
+            Toast.makeText(this, "AIRPLANE MODE ON! Redirecting to settings", Toast.LENGTH_LONG).show();
+            startActivityForResult(new Intent(android.provider.Settings.ACTION_SETTINGS), 0);
+        }
 
-        this.button.setOnClickListener(new MyListener(this.text, this.phoneNumber, this.time, button));
+        else {
+            this.text = (EditText) findViewById(R.id.message);
+            this.phoneNumber = (EditText) findViewById(R.id.phoneNumber);
+            this.time = (EditText) findViewById(R.id.time);
+            this.button = (Button) findViewById(R.id.button);
 
+            this.button.setOnClickListener(new MyListener(this.text, this.phoneNumber, this.time, button));
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isAirplaneModeOn(this)) {
+            Toast.makeText(this, "AIRPLANE MODE ON! Redirecting to settings", Toast.LENGTH_LONG).show();
+            startActivityForResult(new Intent(android.provider.Settings.ACTION_SETTINGS), 0);
+        } else {
+            this.text = (EditText) findViewById(R.id.message);
+            this.phoneNumber = (EditText) findViewById(R.id.phoneNumber);
+            this.time = (EditText) findViewById(R.id.time);
+            this.button = (Button) findViewById(R.id.button);
+
+            this.button.setOnClickListener(new MyListener(this.text, this.phoneNumber, this.time, button));
+
+        }
     }
 
     public class MyListener implements View.OnClickListener{
@@ -112,5 +137,11 @@ public class MainActivity extends AppCompatActivity {
             Log.d("TAG", "INVALID TIME!");
         }
         return check;
+    }
+
+    private boolean isAirplaneModeOn(Context context) {
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+
     }
 }
